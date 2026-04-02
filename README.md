@@ -119,7 +119,7 @@ Os endpoints de leitura utilizam Spring Cache com a chave `todosOsClientes`. O c
 
 ```bash
 # Clone o repositório
-git clone <url-do-repositorio>
+git clone https://github.com/DarkeyS24/Gestor-Project.git
 cd gestor
 
 # Execute com Maven Wrapper
