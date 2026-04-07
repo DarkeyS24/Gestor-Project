@@ -55,6 +55,8 @@ public class ClienteControllerTest {
 
 		Cliente cliente = new Cliente("Angel Perez", TipoCliente.FISICO, "712.296.412-46", "(99)99999-9999",
 				"angel@gmail.com");
+
+		cliente.setCodigo(1);
 		service.inserirCliente(CreateRequestClienteDTO.toDto(cliente));
 
 		URI uri = new URI("/clientes/findById/1");
@@ -96,7 +98,7 @@ public class ClienteControllerTest {
 
 		Cliente cliente = new Cliente("Jose Perez", TipoCliente.FISICO, "712.296.092-70", "(99)99999-9999",
 				"jose@gmail.com");
-
+		cliente.setCodigo(2);
 		URI uri = new URI("/clientes");
 
 		String json = om.writeValueAsString(CreateRequestClienteDTO.toDto(cliente));
@@ -130,6 +132,7 @@ public class ClienteControllerTest {
 		Cliente cliente = new Cliente("Jose Perez", TipoCliente.FISICO, "712.296.092-70", "(99)99999-9999",
 				"jose@gmail.com");
 
+		cliente.setCodigo(2);
 		URI uri = new URI("/clientes");
 
 		String json = om.writeValueAsString(CreateRequestClienteDTO.toDto(cliente));
@@ -144,6 +147,7 @@ public class ClienteControllerTest {
 
 		Cliente cliente = new Cliente("Esteban Perez", TipoCliente.FISICO, "000.000.000-00", "(99)99999-9999",
 				"esteban@gmail.com");
+		cliente.setCodigo(3);
 		cliente.setEmail(null);
 
 		URI uri = new URI("/clientes");
@@ -159,6 +163,7 @@ public class ClienteControllerTest {
 
 		Cliente cliente = new Cliente("Luis Perez", TipoCliente.JURIDICO, "00.394.460/0058-87", "(99)99999-9999",
 				"luis@gmail.com");
+		cliente.setCodigo(4);
 		cliente.setEmail(null);
 
 		URI uri = new URI("/clientes");
@@ -175,6 +180,7 @@ public class ClienteControllerTest {
 
 		Cliente cliente = new Cliente("Luis Boada", TipoCliente.JURIDICO, "00.000.000/0000-00", "(99)99999-9999",
 				"luis@gmail.com");
+		cliente.setCodigo(5);
 		cliente.setEmail(null);
 
 		URI uri = new URI("/clientes");
@@ -202,7 +208,7 @@ public class ClienteControllerTest {
 	@Order(12)
 	public void DeveRetornarStatus400QuandoDadosParaAtualizarDoClienteForamInvalidos() throws Exception {
 
-		UpdateRequestClienteDTO dto = new UpdateRequestClienteDTO("(99)99999-9999", null);
+		UpdateRequestClienteDTO dto = new UpdateRequestClienteDTO(null, "josep@gmail.com");
 		String json = om.writeValueAsString(dto);
 		URI uri = new URI("/clientes/2");
 
@@ -216,7 +222,7 @@ public class ClienteControllerTest {
 
 		UpdateRequestClienteDTO dto = new UpdateRequestClienteDTO("(99)99999-9999", null);
 		String json = om.writeValueAsString(dto);
-		URI uri = new URI("/clientes/3");
+		URI uri = new URI("/clientes/R");
 
 		mock.perform(MockMvcRequestBuilders.put(uri).content(json).contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().is(400));

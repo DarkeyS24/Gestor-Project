@@ -1,10 +1,9 @@
 package br.com.drky.gestor.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.drky.gestor.dto.CreateRequestClienteDTO;
+import br.com.drky.gestor.dto.RequestVerificacaoDTO;
 import br.com.drky.gestor.dto.ResponseClienteDTO;
 import br.com.drky.gestor.dto.UpdateRequestClienteDTO;
 import br.com.drky.gestor.model.Cliente;
@@ -31,13 +31,20 @@ public class ClienteController {
 	private ClienteService service;
 
 	@GetMapping
-	@Cacheable(value = "todosOsClientes")
 	public ResponseEntity<List<ResponseClienteDTO>> BuscaTodosOsClientes() {
 		return ResponseEntity.ok(ResponseClienteDTO.toDtoList(service.BuscaTodosOsClientes()));
 	}
 
+	@PostMapping("/verificar")
+	public ResponseEntity<Boolean> estaCadastrado(@RequestBody @Valid RequestVerificacaoDTO dto) {
+		Optional<Cliente> cliente = service.buscaClientePorCpfCnpj(dto.documento());
+		if (cliente.isPresent()) {
+			return ResponseEntity.ok(true);
+		}
+		return ResponseEntity.ok(false);
+	}
+
 	@GetMapping("/findById/{id}")
-	@Cacheable(value = "todosOsClientes")
 	public ResponseEntity<ResponseClienteDTO> buscaClientePorId(@PathVariable("id") Integer id) {
 		Cliente cliente = service.buscaClientePorId(id);
 		return ResponseEntity.ok(ResponseClienteDTO.toDto(cliente));
@@ -45,7 +52,6 @@ public class ClienteController {
 
 	@PostMapping
 	@Transactional
-	@CacheEvict(value = "todosOsClientes")
 	public ResponseEntity<?> inserirCliente(@RequestBody @Valid CreateRequestClienteDTO dto) {
 		service.inserirCliente(dto);
 		return ResponseEntity.ok("Cliente criado com sucesso!!");
@@ -53,16 +59,14 @@ public class ClienteController {
 
 	@PutMapping("/{id}")
 	@Transactional
-	@CacheEvict(value = "todosOsClientes")
 	public ResponseEntity<?> atualizarCliente(@PathVariable("id") Integer id,
-			@RequestBody UpdateRequestClienteDTO dto) {
+			@RequestBody @Valid UpdateRequestClienteDTO dto) {
 		service.atualizarCliente(id, dto);
 		return ResponseEntity.ok("Cliente atualizado com sucesso!!");
 	}
 
 	@DeleteMapping("/{id}")
 	@Transactional
-	@CacheEvict(value = "todosOsClientes")
 	public ResponseEntity<?> excluirClientePorId(@PathVariable("id") Integer id) {
 		service.excluirClientePorId(id);
 		return ResponseEntity.ok("Cliente excluido com sucesso!!");

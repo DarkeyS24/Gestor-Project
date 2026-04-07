@@ -1,4 +1,6 @@
 package br.com.drky.gestor.dto;
 
-public record UpdateRequestClienteDTO(String telefone, String email) {
+import jakarta.validation.constraints.NotBlank;
+
+public record UpdateRequestClienteDTO(@NotBlank String telefone, String email) {
 }

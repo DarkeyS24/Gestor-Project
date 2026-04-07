@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.drky.gestor.dto.CreateRequestClienteDTO;
 import br.com.drky.gestor.dto.UpdateRequestClienteDTO;
@@ -18,6 +20,8 @@ import br.com.drky.gestor.model.enums.TipoCliente;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Transactional
 public class ClienteServiceTest {
 
 	@Autowired
@@ -52,6 +56,8 @@ public class ClienteServiceTest {
 		Cliente novoCliente = new Cliente("Jose Perez", TipoCliente.FISICO, "712.296.412-46", "(88)88888-8888",
 				"jose@gmail.com");
 
+		cliente.setCodigo(1);
+		novoCliente.setCodigo(2);
 		service.inserirCliente(CreateRequestClienteDTO.toDto(cliente));
 
 		RegisteredClientException assertThrows = Assertions.assertThrows(RegisteredClientException.class, () -> {
@@ -63,11 +69,16 @@ public class ClienteServiceTest {
 
 	@Test
 	public void DeveriaLancarUmaExceptionQuandoCnpjJaEstiverCadastrado() {
+
+		service.deleteAll();
+
 		Cliente cliente = new Cliente("Angel Perez", TipoCliente.JURIDICO, "00.394.460/0058-87", "(99)99999-9999",
 				"angel@gmail.com");
 		Cliente novoCliente = new Cliente("Jose Perez", TipoCliente.JURIDICO, "00.394.460/0058-87", "(88)88888-8888",
 				"jose@gmail.com");
 
+		cliente.setCodigo(3);
+		novoCliente.setCodigo(4);
 		service.inserirCliente(CreateRequestClienteDTO.toDto(cliente));
 
 		RegisteredClientException assertThrows = Assertions.assertThrows(RegisteredClientException.class, () -> {
@@ -82,7 +93,7 @@ public class ClienteServiceTest {
 		Cliente cliente = new Cliente("Candelaria Henriquez", TipoCliente.FISICO, "000.000.000-00", "(99)99999-9999",
 				"nena@gmail.com");
 
-		Integer id = 3;
+		Integer id = 5;
 
 		ClientNotFoundException assertThrows = Assertions.assertThrows(ClientNotFoundException.class, () -> {
 			service.atualizarCliente(id, new UpdateRequestClienteDTO(cliente.getTelefone(), cliente.getEmail()));
@@ -93,12 +104,16 @@ public class ClienteServiceTest {
 
 	@Test
 	public void DeveriaLancarUmaExceptionQuandoClientePesquisadoPorIdNãoCadastrado() {
+
+		service.deleteAll();
+
 		Cliente cliente = new Cliente("Luis Enrique", TipoCliente.FISICO, "712.296.092-70", "(99)99999-9999",
 				"luis@gmail.com");
 
+		cliente.setCodigo(5);
 		service.inserirCliente(CreateRequestClienteDTO.toDto(cliente));
 
-		Integer id = 4;
+		Integer id = 6;
 
 		ClientNotFoundException assertThrows = Assertions.assertThrows(ClientNotFoundException.class, () -> {
 			service.buscaClientePorId(id);
@@ -109,10 +124,15 @@ public class ClienteServiceTest {
 
 	@Test
 	public void DeveriaRetornarOClientePesquisadoPorIdQuandoCadastrado() {
+
+		service.deleteAll();
+
 		Cliente cliente = new Cliente("Luis Enrique", TipoCliente.FISICO, "712.296.092-70", "(99)99999-9999",
 				"luis@gmail.com");
-		Integer id = 3;
+
+		Integer id = 5;
 		cliente.setCodigo(id);
+		service.inserirCliente(CreateRequestClienteDTO.toDto(cliente));
 
 		Assertions.assertEquals(cliente.getCodigo(), service.buscaClientePorId(id).getCodigo());
 	}
@@ -120,9 +140,23 @@ public class ClienteServiceTest {
 	@Test
 	public void DeveriaRetornarUmaListaClientes() {
 
+		service.deleteAll();
+
+		Cliente cliente = new Cliente("Angel Perez", TipoCliente.JURIDICO, "00.394.460/0058-87", "(99)99999-9999",
+				"angel@gmail.com");
+		Cliente novoCliente = new Cliente("Jose Perez", TipoCliente.FISICO, "712.296.412-46", "(88)88888-8888",
+				"jose@gmail.com");
+
+		cliente.setCodigo(1);
+		novoCliente.setCodigo(2);
+
+		service.inserirCliente(CreateRequestClienteDTO.toDto(cliente));
+		service.inserirCliente(CreateRequestClienteDTO.toDto(novoCliente));
+
 		List<Cliente> clientes = service.BuscaTodosOsClientes();
 		if (clientes.size() > 0) {
 			for (int i = 0; i < clientes.size(); i++) {
+				System.out.println(clientes.get(i).getNome());
 				Assertions.assertEquals(i + 1, clientes.get(i).getCodigo());
 			}
 		}
@@ -131,7 +165,7 @@ public class ClienteServiceTest {
 	@Test
 	public void DeveriaLancarUmaExceptionQuandoClienteExcluidoPorIdNãoCadastrado() {
 
-		Integer id = 4;
+		Integer id = 100;
 
 		ClientNotFoundException assertThrows = Assertions.assertThrows(ClientNotFoundException.class, () -> {
 			service.excluirClientePorId(id);

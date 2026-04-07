@@ -3,8 +3,6 @@ package br.com.drky.gestor.model;
 import br.com.drky.gestor.model.enums.TipoCliente;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -13,12 +11,13 @@ import jakarta.persistence.Table;
 public class Cliente {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer codigo;
 	private String nome;
 	private TipoCliente tipo;
 	private String cpfCnpj;
 	private String telefone;
+	private Boolean sincronizado;
+	private Boolean excluido;
 
 	@Nullable
 	private String email;
@@ -29,9 +28,27 @@ public class Cliente {
 		this.cpfCnpj = cpf_cnpj;
 		this.telefone = telefone;
 		this.email = email;
+		this.sincronizado = false;
+		this.excluido = false;
 	}
 
 	public Cliente() {
+	}
+
+	public Boolean getSincronizado() {
+		return sincronizado;
+	}
+
+	public void setSincronizado(Boolean sincronizado) {
+		this.sincronizado = sincronizado;
+	}
+
+	public Boolean getExcluido() {
+		return excluido;
+	}
+
+	public void setExcluido(Boolean excluido) {
+		this.excluido = excluido;
 	}
 
 	public Integer getCodigo() {
